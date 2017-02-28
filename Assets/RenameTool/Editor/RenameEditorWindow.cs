@@ -17,8 +17,18 @@ namespace UnityRenameTool.Editor {
 			}
 		}
 
-		FindMode    _mode        = FindMode.Simple;
+		ObservedFindModeField _findModeObserver = null;
+		ObservedFindModeField FindModeObserver {
+			get {
+				if( _findModeObserver == null ) {
+					_findModeObserver = new ObservedFindModeField(OnFindModeChanged);
+				}
+				return _findModeObserver;
+			}
+		}
+
 		string      _replaceText = "";
+		int        _replaceCount = -1;
 		INameWorker _worker      = null;
 
 		void OnGUI() {
@@ -44,13 +54,17 @@ namespace UnityRenameTool.Editor {
 				}
 				using ( new HorizontalLayout() ) {
 					GUILayout.Label("Find Mode:");
-					_mode = (FindMode)EditorGUILayout.EnumPopup(_mode);
+					FindModeObserver.Read();
+				}
+				using ( new HorizontalLayout() ) {
+					GUILayout.Label("Replaces:");
+					_replaceCount = EditorGUILayout.IntField(_replaceCount);
 				}
 			}
 		}
 
-		INameWorker CreateWorker(string text) {
-			switch( _mode ) {
+		INameWorker CreateWorker(FindMode mode, string text) {
+			switch( mode ) {
 				case FindMode.Simple: return new SimpleNameWorker(text);
 				case FindMode.RegExp: return new RegExNameWorker (text);
 				default: return null;
@@ -58,7 +72,17 @@ namespace UnityRenameTool.Editor {
 		}
 
 		void OnFindTextChanged(string text) {
-			_worker = CreateWorker(text);
+			InitSearch();
+		}
+
+		void OnFindModeChanged(FindMode mode) {
+			InitSearch();
+		}
+
+		void InitSearch() {
+			var text = FindTextObserver.Value;
+			var mode = FindModeObserver.Value;
+			_worker = CreateWorker(mode, text);
 			if( _worker != null ) {
 				var findTool = new FindTool(FindFunc);
 				var filterResult = findTool.FilterObjects(text);
@@ -99,7 +123,7 @@ namespace UnityRenameTool.Editor {
 
 		string ReplaceFunc(string name) {
 			if( _worker != null ) {
-				return _worker.Replace(name, _replaceText);
+				return _worker.Replace(name, _replaceText, _replaceCount);
 			}
 			return name;
 		}

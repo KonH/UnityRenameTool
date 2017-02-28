@@ -13,8 +13,8 @@ namespace UnityRenameTool {
 			return _regex.IsMatch(name);
 		}
 		
-		public string Replace(string name, string replacer) {
-			return _regex.Replace(name, replacer);
+		public string Replace(string name, string replacer, int count) {
+			return _regex.Replace(name, replacer, count);
 		}
 	}
 }
