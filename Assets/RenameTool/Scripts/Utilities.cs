@@ -2,7 +2,7 @@
 using UnityEngine;
 
 namespace UnityRenameTool {
-	class VerticalLayout : IDisposable {
+	public class VerticalLayout : IDisposable {
 		public VerticalLayout(params GUILayoutOption[] options) {
 			GUILayout.BeginVertical(options);
 		}
@@ -12,7 +12,7 @@ namespace UnityRenameTool {
 		}
 	}
 
-	class HorizontalLayout : IDisposable {
+	public class HorizontalLayout : IDisposable {
 		public HorizontalLayout(params GUILayoutOption[] options) {
 			GUILayout.BeginHorizontal(options);
 		}
@@ -22,7 +22,7 @@ namespace UnityRenameTool {
 		}
 	}
 
-	class ObservedTextField {
+	public class ObservedTextField {
 		
 		string _text = "";
 		Action<string> _onChanged = null;
