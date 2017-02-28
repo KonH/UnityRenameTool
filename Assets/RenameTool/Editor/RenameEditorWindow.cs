@@ -17,9 +17,9 @@ namespace UnityRenameTool.Editor {
 			}
 		}
 
-		string _replaceText = "";
-
-		INameWorker _worker = null;
+		FindMode    _mode        = FindMode.Simple;
+		string      _replaceText = "";
+		INameWorker _worker      = null;
 
 		void OnGUI() {
 			using ( new VerticalLayout(GUILayout.MaxWidth(MaxWidth)) ) {
@@ -42,23 +42,48 @@ namespace UnityRenameTool.Editor {
 						RenameAllSelected();
 					}
 				}
+				using ( new HorizontalLayout() ) {
+					GUILayout.Label("Find Mode:");
+					_mode = (FindMode)EditorGUILayout.EnumPopup(_mode);
+				}
+			}
+		}
+
+		INameWorker CreateWorker(string text) {
+			switch( _mode ) {
+				case FindMode.Simple: return new SimpleNameWorker(text);
+				case FindMode.RegExp: return new RegExNameWorker (text);
+				default: return null;
 			}
 		}
 
 		void OnFindTextChanged(string text) {
-			_worker = new SimpleNameWorker(text);
-			var findTool = new FindTool(FindFunc);
-			var filterResult = findTool.FilterObjects(text);
-			Selection.objects = filterResult;
+			_worker = CreateWorker(text);
+			if( _worker != null ) {
+				var findTool = new FindTool(FindFunc);
+				var filterResult = findTool.FilterObjects(text);
+				Selection.objects = filterResult;
+			}
 		}
 
 		void RenameFirstSelected() {
 			var selection = Selection.gameObjects;
 			var firstSelected = 
 				selection.Length > 0 
-				? selection[selection.Length - 1] 
+				? selection[0] 
 				: null;
-			RenameTool.Rename(firstSelected, ReplaceFunc);
+			if( firstSelected ) {
+				RenameTool.Rename(firstSelected, ReplaceFunc);
+				Selection.objects = ReduceSelection(Selection.objects);
+			}
+		}
+
+		Object[] ReduceSelection(Object[] objects) {
+			var newObjects = new Object[objects.Length - 1];
+			for( int i = 1; i < objects.Length; i++ ) {
+				newObjects[i - 1] = objects[i];
+			}
+			return newObjects;
 		}
 
 		void RenameAllSelected() {
@@ -66,11 +91,17 @@ namespace UnityRenameTool.Editor {
 		}
 
 		bool FindFunc(string name) {
-			return _worker.IsWantedName(name);
+			if( _worker != null ) {
+				return _worker.IsWantedName(name);
+			}
+			return false;
 		}
 
 		string ReplaceFunc(string name) {
-			return _worker.Replace(name, _replaceText);
+			if( _worker != null ) {
+				return _worker.Replace(name, _replaceText);
+			}
+			return name;
 		}
     }
 }
