@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace UnityRenameTool {
-	public class FindTool : MonoBehaviour {
+	public static class FindTool {
 		public static void FilterObjects(List<Object> container, GameObject gameObject, string text) {
 			if ( gameObject ) {
 				if( IsWantedGameObject(gameObject, text) ) {
