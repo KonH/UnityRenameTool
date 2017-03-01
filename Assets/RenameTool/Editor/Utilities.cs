@@ -92,4 +92,13 @@ namespace UnityRenameTool.Editor {
 			return EditorGUILayout.ObjectField(Value, _type, true);
 		}
 	}
+
+	public class ObservedLocationModeField: ObservedFieldBase<LocationMode> {
+
+		public ObservedLocationModeField(Action<LocationMode> onChanged):base(onChanged) {}
+
+		public override LocationMode ReadValue() {
+			return (LocationMode)EditorGUILayout.EnumPopup(Value);
+		}
+	}
 }

@@ -3,11 +3,11 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace UnityRenameTool {
-	public class FindTool {
+	public class SceneFindTool {
 
 		System.Func<string, bool> _isWantedName = null;
 
-		public FindTool(System.Func<string, bool> isWantedName) {
+		public SceneFindTool(System.Func<string, bool> isWantedName) {
 			_isWantedName = isWantedName;
 		}
 

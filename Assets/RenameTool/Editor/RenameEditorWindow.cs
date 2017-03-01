@@ -48,6 +48,16 @@ namespace UnityRenameTool.Editor {
 			}
 		}
 
+		ObservedLocationModeField _locModeObserver = null;
+		ObservedLocationModeField LocModeObserver {
+			get {
+				if( _locModeObserver == null ) {
+					_locModeObserver = new ObservedLocationModeField(OnLocationModeChanged);
+				}
+				return _locModeObserver;
+			}
+		}
+
 		string      _replaceText = "";
 		int        _replaceCount = -1;
 		INameWorker _worker      = null;
@@ -86,6 +96,10 @@ namespace UnityRenameTool.Editor {
 					GUILayout.Label("Count:", GUILayout.Width(TextWidth));
 					_replaceCount = EditorGUILayout.IntField(_replaceCount);
 				}
+				using ( new HorizontalLayout(GUILayout.Width(ToolsWidth)) ) {
+					GUILayout.Label("Find In:", GUILayout.Width(TextWidth));
+					LocModeObserver.Read();
+				}
 			}
 		}
 
@@ -113,16 +127,36 @@ namespace UnityRenameTool.Editor {
 			InitSearch();
 		}
 
+		void OnLocationModeChanged(LocationMode mode) {
+			InitSearch();
+		}
+
 		void InitSearch() {
 			var text = FindTextObserver.Value;
-			var mode = FindModeObserver.Value;
+			var findMode = FindModeObserver.Value;
 			var ignoreCase = IgnoreCaseToggle.Value;
 			var root = RootObserver.Value as GameObject;
-			_worker = CreateWorker(mode, text, ignoreCase);
+			var locMode = LocModeObserver.Value;
+			_worker = CreateWorker(findMode, text, ignoreCase);
 			if( _worker != null ) {
-				var findTool = new FindTool(FindFunc);
-				var filterResult = findTool.FilterObjects(root, text);
+				var filterResult = FilterObjects(locMode, root, text);
 				Selection.objects = filterResult;
+			}
+		}
+
+		Object[] FilterObjects(LocationMode locMode, GameObject root, string text) {
+			switch( locMode ) {
+				case LocationMode.Scene: {
+					var sceneFindTool = new SceneFindTool(FindFunc);
+					return sceneFindTool.FilterObjects(root, text);
+				}
+
+				case LocationMode.Project: {
+					var projFindTool = new ProjectFindTool(FindFunc);
+					return projFindTool.FilterObjects(text);
+				}
+
+				default: return null;
 			}
 		}
 
@@ -131,7 +165,18 @@ namespace UnityRenameTool.Editor {
 		}
 
 		void RenameAllSelected() {
-			RenameTool.Rename(Selection.gameObjects, ReplaceFunc);
+			var locMode = LocModeObserver.Value;
+			switch( locMode ) {
+				case LocationMode.Scene: {
+					SceneRenameTool.Rename(Selection.objects, ReplaceFunc);
+				}
+				break;
+
+				case LocationMode.Project: {
+					ProjectRenameTool.Rename(Selection.objects, ReplaceFunc);
+				}
+				break;
+			}
 		}
 
 		bool FindFunc(string name) {
