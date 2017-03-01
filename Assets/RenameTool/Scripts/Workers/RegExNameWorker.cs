@@ -5,8 +5,11 @@ namespace UnityRenameTool {
 		
 		Regex _regex = null;
 
-		public RegExNameWorker(string condition) {
-			_regex = new Regex(condition);
+		public RegExNameWorker(string condition, bool ignoreCase) {
+			_regex =
+				ignoreCase 
+				? new Regex(condition, RegexOptions.IgnoreCase)
+				: new Regex(condition);
 		}
 
 		public bool IsWantedName(string name) {

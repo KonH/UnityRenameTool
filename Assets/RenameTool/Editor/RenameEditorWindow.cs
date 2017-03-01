@@ -5,6 +5,7 @@ namespace UnityRenameTool.Editor {
 	public class RenameEditorWindow : EditorWindow {
 		
 		const float MaxWidth  = 300.0f;
+		const float ToolsWidth = 200.0f;
 		const float TextWidth = 50.0f;
 
 		ObservedTextField _findTextObserver = null;
@@ -24,6 +25,16 @@ namespace UnityRenameTool.Editor {
 					_findModeObserver = new ObservedFindModeField(OnFindModeChanged);
 				}
 				return _findModeObserver;
+			}
+		}
+
+		ObservedToggle _ignoreCaseToggle = null;
+		ObservedToggle IgnoreCaseToggle {
+			get {
+				if( _ignoreCaseToggle == null ) {
+					_ignoreCaseToggle = new ObservedToggle(OnIgnoreCaseChanged, "Ignore case");
+				}
+				return _ignoreCaseToggle;
 			}
 		}
 
@@ -52,21 +63,22 @@ namespace UnityRenameTool.Editor {
 						RenameAllSelected();
 					}
 				}
-				using ( new HorizontalLayout() ) {
-					GUILayout.Label("Find Mode:");
+				using ( new HorizontalLayout(GUILayout.Width(ToolsWidth)) ) {
+					GUILayout.Label("Mode:", GUILayout.Width(TextWidth));
 					FindModeObserver.Read();
+					IgnoreCaseToggle.Read();
 				}
-				using ( new HorizontalLayout() ) {
-					GUILayout.Label("Replaces:");
+				using ( new HorizontalLayout(GUILayout.Width(ToolsWidth)) ) {
+					GUILayout.Label("Count:", GUILayout.Width(TextWidth));
 					_replaceCount = EditorGUILayout.IntField(_replaceCount);
 				}
 			}
 		}
 
-		INameWorker CreateWorker(FindMode mode, string text) {
+		INameWorker CreateWorker(FindMode mode, string text, bool ignoreCase) {
 			switch( mode ) {
-				case FindMode.Simple: return new SimpleNameWorker(text);
-				case FindMode.RegExp: return new RegExNameWorker (text);
+				case FindMode.Simple: return new SimpleNameWorker(text, ignoreCase);
+				case FindMode.RegExp: return new RegExNameWorker (text, ignoreCase);
 				default: return null;
 			}
 		}
@@ -79,10 +91,15 @@ namespace UnityRenameTool.Editor {
 			InitSearch();
 		}
 
+		void OnIgnoreCaseChanged(bool value) {
+			InitSearch();
+		}
+
 		void InitSearch() {
 			var text = FindTextObserver.Value;
 			var mode = FindModeObserver.Value;
-			_worker = CreateWorker(mode, text);
+			var ignoreCase = IgnoreCaseToggle.Value;
+			_worker = CreateWorker(mode, text, ignoreCase);
 			if( _worker != null ) {
 				var findTool = new FindTool(FindFunc);
 				var filterResult = findTool.FilterObjects(text);

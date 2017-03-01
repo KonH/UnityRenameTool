@@ -63,4 +63,25 @@ namespace UnityRenameTool.Editor {
 			}
 		}
 	}
+
+	public class ObservedToggle {
+		Action<bool> _onChanged = null;
+		string       _text      = "";
+
+		public bool Value { get; private set; }
+
+		public ObservedToggle(Action<bool> onChanged, string text) {
+			_onChanged = onChanged;
+			_text = text;
+		}
+
+		public void Read() {
+			var tempValue = GUILayout.Toggle(Value, _text);
+			var changed = (tempValue != Value);
+			Value = tempValue;
+			if( changed ) {
+				_onChanged(Value);
+			}
+		}
+	}
 }
