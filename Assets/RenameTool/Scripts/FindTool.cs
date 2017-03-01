@@ -11,9 +11,9 @@ namespace UnityRenameTool {
 			_isWantedName = isWantedName;
 		}
 
-		public Object[] FilterObjects(string text) {
+		public Object[] FilterObjects(GameObject root, string text) {
 			var container = new List<Object>();
-			FilterObjects(container, null, text);
+			FilterObjects(container, root, text);
 			return container.ToArray();
 		}
 

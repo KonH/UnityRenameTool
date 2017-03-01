@@ -24,7 +24,7 @@ namespace UnityRenameTool.Editor {
 		}
 	}
 
-	public abstract class ObservedFieldBase<T> where T:IComparable {
+	public abstract class ObservedFieldBase<T> {
 
 		public T Value { get; protected set; }
 		protected Action<T> _onChanged = null;
@@ -78,6 +78,18 @@ namespace UnityRenameTool.Editor {
 
 		public override bool ReadValue() {
 			return GUILayout.Toggle(Value, _text);
+		}
+	}
+
+	public class ObservedObjectField: ObservedFieldBase<UnityEngine.Object> {
+		Type _type = null;
+
+		public ObservedObjectField(Action<UnityEngine.Object> onChanged, Type type):base(onChanged) {
+			_type = type;
+		}
+
+		public override UnityEngine.Object ReadValue() {
+			return EditorGUILayout.ObjectField(Value, _type, true);
 		}
 	}
 }

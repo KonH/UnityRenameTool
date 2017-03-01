@@ -38,6 +38,16 @@ namespace UnityRenameTool.Editor {
 			}
 		}
 
+		ObservedObjectField _rootObserver = null;
+		ObservedObjectField RootObserver {
+			get {
+				if( _rootObserver == null ) {
+					_rootObserver = new ObservedObjectField(OnRootChanged, typeof(GameObject));
+				}
+				return _rootObserver;
+			}
+		}
+
 		string      _replaceText = "";
 		int        _replaceCount = -1;
 		INameWorker _worker      = null;
@@ -46,6 +56,10 @@ namespace UnityRenameTool.Editor {
 			using ( new VerticalLayout(GUILayout.MaxWidth(MaxWidth)) ) {
 				using ( new HorizontalLayout() ) {
 					GUILayout.Label("Rename Tool");
+				}
+				using ( new HorizontalLayout() ) {
+					GUILayout.Label("Root:", GUILayout.Width(TextWidth));
+					RootObserver.Read();
 				}
 				using ( new HorizontalLayout() ) {
 					GUILayout.Label("Find:", GUILayout.Width(TextWidth));
@@ -95,14 +109,19 @@ namespace UnityRenameTool.Editor {
 			InitSearch();
 		}
 
+		void OnRootChanged(UnityEngine.Object obj) {
+			InitSearch();
+		}
+
 		void InitSearch() {
 			var text = FindTextObserver.Value;
 			var mode = FindModeObserver.Value;
 			var ignoreCase = IgnoreCaseToggle.Value;
+			var root = RootObserver.Value as GameObject;
 			_worker = CreateWorker(mode, text, ignoreCase);
 			if( _worker != null ) {
 				var findTool = new FindTool(FindFunc);
-				var filterResult = findTool.FilterObjects(text);
+				var filterResult = findTool.FilterObjects(root, text);
 				Selection.objects = filterResult;
 			}
 		}
