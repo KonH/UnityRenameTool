@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
@@ -23,65 +24,60 @@ namespace UnityRenameTool.Editor {
 		}
 	}
 
-	public class ObservedTextField {
+	public abstract class ObservedFieldBase<T> where T:IComparable {
+
+		public T Value { get; protected set; }
+		protected Action<T> _onChanged = null;
+
+		public ObservedFieldBase(Action<T> onChanged) {
+			_onChanged = onChanged;
+		}
+
+		public void Read() {
+			var tempValue = ReadValue();
+			var changed = !Compare(tempValue, Value);
+			Value = tempValue;
+			if( changed ) {
+				_onChanged(Value);
+			}
+		}
+
+		bool Compare(T x, T y) {
+			return EqualityComparer<T>.Default.Equals(x, y);
+		}
+
+		public abstract T ReadValue();
+	}
+
+	public class ObservedTextField: ObservedFieldBase<string> {
 		
-		Action<string> _onChanged = null;
-
-		public string Value { get; private set; }
-
-		public ObservedTextField(Action<string> onChanged) {
+		public ObservedTextField(Action<string> onChanged):base(onChanged) {
 			Value = "";
-			_onChanged = onChanged;
 		}
 
-		public void Read() {
-			var tempValue = GUILayout.TextField(Value);
-			var changed = (tempValue != Value);
-			Value = tempValue;
-			if( changed ) {
-				_onChanged(Value);
-			}
+		public override string ReadValue() {
+			return GUILayout.TextField(Value);
 		}
 	}
 
-	public class ObservedFindModeField {
+	public class ObservedFindModeField: ObservedFieldBase<FindMode> {
 
-		Action<FindMode> _onChanged = null;
+		public ObservedFindModeField(Action<FindMode> onChanged):base(onChanged) {}
 
-		public FindMode Value { get; private set; }
-
-		public ObservedFindModeField(Action<FindMode> onChanged) {
-			_onChanged = onChanged;
-		}
-
-		public void Read() {
-			var tempValue = (FindMode)EditorGUILayout.EnumPopup(Value);
-			var changed = (tempValue != Value);
-			Value = tempValue;
-			if( changed ) {
-				_onChanged(Value);
-			}
+		public override FindMode ReadValue() {
+			return (FindMode)EditorGUILayout.EnumPopup(Value);
 		}
 	}
 
-	public class ObservedToggle {
-		Action<bool> _onChanged = null;
-		string       _text      = "";
+	public class ObservedToggle: ObservedFieldBase<bool> {
+		string _text = "";
 
-		public bool Value { get; private set; }
-
-		public ObservedToggle(Action<bool> onChanged, string text) {
-			_onChanged = onChanged;
+		public ObservedToggle(Action<bool> onChanged, string text):base(onChanged) {
 			_text = text;
 		}
 
-		public void Read() {
-			var tempValue = GUILayout.Toggle(Value, _text);
-			var changed = (tempValue != Value);
-			Value = tempValue;
-			if( changed ) {
-				_onChanged(Value);
-			}
+		public override bool ReadValue() {
+			return GUILayout.Toggle(Value, _text);
 		}
 	}
 }
