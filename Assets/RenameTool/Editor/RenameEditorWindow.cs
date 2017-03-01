@@ -45,10 +45,10 @@ namespace UnityRenameTool.Editor {
 					_replaceText = GUILayout.TextField(_replaceText);
 				}
 				using ( new HorizontalLayout() ) {
-					if ( GUILayout.Button("Rename") ) {
-						RenameFirstSelected();
+					if( GUILayout.Button("Refresh") ) {
+						Refresh();
 					}
-					if( GUILayout.Button("Rename All") ) {
+					if( GUILayout.Button("Rename") ) {
 						RenameAllSelected();
 					}
 				}
@@ -90,24 +90,8 @@ namespace UnityRenameTool.Editor {
 			}
 		}
 
-		void RenameFirstSelected() {
-			var selection = Selection.gameObjects;
-			var firstSelected = 
-				selection.Length > 0 
-				? selection[0] 
-				: null;
-			if( firstSelected ) {
-				RenameTool.Rename(firstSelected, ReplaceFunc);
-				Selection.objects = ReduceSelection(Selection.objects);
-			}
-		}
-
-		Object[] ReduceSelection(Object[] objects) {
-			var newObjects = new Object[objects.Length - 1];
-			for( int i = 1; i < objects.Length; i++ ) {
-				newObjects[i - 1] = objects[i];
-			}
-			return newObjects;
+		void Refresh() {
+			InitSearch();
 		}
 
 		void RenameAllSelected() {
