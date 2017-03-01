@@ -67,9 +67,15 @@ namespace UnityRenameTool.Editor {
 				using ( new HorizontalLayout() ) {
 					GUILayout.Label("Rename Tool");
 				}
-				using ( new HorizontalLayout() ) {
-					GUILayout.Label("Root:", GUILayout.Width(TextWidth));
-					RootObserver.Read();
+				using ( new HorizontalLayout(GUILayout.Width(ToolsWidth)) ) {
+					GUILayout.Label("Find In:", GUILayout.Width(TextWidth));
+					LocModeObserver.Read();
+				}
+				if( LocModeObserver.Value == LocationMode.Scene ) {
+					using ( new HorizontalLayout() ) {
+						GUILayout.Label("Root:", GUILayout.Width(TextWidth));
+						RootObserver.Read();
+					}
 				}
 				using ( new HorizontalLayout() ) {
 					GUILayout.Label("Find:", GUILayout.Width(TextWidth));
@@ -87,18 +93,16 @@ namespace UnityRenameTool.Editor {
 						RenameAllSelected();
 					}
 				}
-				using ( new HorizontalLayout(GUILayout.Width(ToolsWidth)) ) {
-					GUILayout.Label("Mode:", GUILayout.Width(TextWidth));
-					FindModeObserver.Read();
-					IgnoreCaseToggle.Read();
+				if( LocModeObserver.Value == LocationMode.Scene ) {
+					using ( new HorizontalLayout(GUILayout.Width(ToolsWidth)) ) {
+						GUILayout.Label("Mode:", GUILayout.Width(TextWidth));
+						FindModeObserver.Read();
+						IgnoreCaseToggle.Read();
+					}
 				}
 				using ( new HorizontalLayout(GUILayout.Width(ToolsWidth)) ) {
 					GUILayout.Label("Count:", GUILayout.Width(TextWidth));
 					_replaceCount = EditorGUILayout.IntField(_replaceCount);
-				}
-				using ( new HorizontalLayout(GUILayout.Width(ToolsWidth)) ) {
-					GUILayout.Label("Find In:", GUILayout.Width(TextWidth));
-					LocModeObserver.Read();
 				}
 			}
 		}
@@ -133,10 +137,12 @@ namespace UnityRenameTool.Editor {
 
 		void InitSearch() {
 			var text = FindTextObserver.Value;
-			var findMode = FindModeObserver.Value;
 			var ignoreCase = IgnoreCaseToggle.Value;
 			var root = RootObserver.Value as GameObject;
 			var locMode = LocModeObserver.Value;
+			var findMode = (locMode == LocationMode.Scene) 
+				? FindModeObserver.Value
+				: FindMode.Simple;
 			_worker = CreateWorker(findMode, text, ignoreCase);
 			if( _worker != null ) {
 				var filterResult = FilterObjects(locMode, root, text);
