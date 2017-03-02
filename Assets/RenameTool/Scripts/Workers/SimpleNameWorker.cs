@@ -1,4 +1,6 @@
-﻿namespace UnityRenameTool {
+﻿using System.Collections.Generic;
+
+namespace UnityRenameTool {
 	public class SimpleNameWorker : INameWorker {
 		
 		string _condition  = null;
@@ -32,17 +34,26 @@
 		}
 
 		string ReplaceWithCount(string name, string replacer, int count) {
-			var pos = name.ToLowerInvariant().IndexOf(_condition);
-			if ( pos < 0 ) {
-				return name;
+			var readyName = 
+				_ignoreCase 
+				? name.ToLowerInvariant()
+				: name;
+
+			var indexes = new List<int>();
+			for ( int index = 0; index < readyName.Length; index += _condition.Length ) {
+        		index = readyName.IndexOf(_condition, index);
+        		if ( ( index < 0 ) || (indexes.Count >= count) ) {
+            		break;
+				}
+        		indexes.Add(index);
+    		}
+
+			var result = name;
+			for( int i = indexes.Count - 1; i >= 0; i-- ) {
+				var index = indexes[i];
+				result = result.Substring(0, index) + replacer + result.Substring(index + _condition.Length);
 			}
-			var newCount = count - 1;
-			var newName = name.Substring(0, pos) + replacer + name.Substring(pos + _condition.Length);
-			if( newCount == 0 ) {
-				return newName;
-			} else {
-				return ReplaceWithCount(newName, replacer, newCount);
-			}
+			return result;
 		}
 	}
 }
