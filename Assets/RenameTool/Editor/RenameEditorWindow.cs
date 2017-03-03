@@ -8,6 +8,13 @@ namespace UnityRenameTool.Editor {
 		const float ToolsWidth = 200.0f;
 		const float TextWidth = 50.0f;
 
+		const string RootTooltip    = "Find in gameObject and its childs";
+		const string FindTooltip    = "Part of object name to find";
+		const string ReplaceTooltip = "What replaces 'Find' part";
+		const string RefreshTooltip = "Update results manually";
+		const string RenameTooltip  = "Rename all selected objects";
+		const string CountTooltip   = "How many matches would be replaced ('-1' for all)";
+
 		ObservedTextField _findTextObserver = null;
 		ObservedTextField FindTextObserver {
 			get {
@@ -62,10 +69,26 @@ namespace UnityRenameTool.Editor {
 		int        _replaceCount = -1;
 		INameWorker _worker      = null;
 
+		GUIStyle _headerStyle = null;
+
+		GUIContent _rootLabelContent     = new GUIContent("Root:",    RootTooltip);
+		GUIContent _findLabelContent     = new GUIContent("Find:",    FindTooltip);
+		GUIContent _replaceLabelContent  = new GUIContent("Replace:", ReplaceTooltip);
+		GUIContent _refreshButtonContent = new GUIContent("Refresh",  RefreshTooltip);
+		GUIContent _renameButtonContent  = new GUIContent("Rename",   RenameTooltip);
+		GUIContent _countLabelContent    = new GUIContent("Count:",   CountTooltip);
+
 		void OnGUI() {
+			if( _headerStyle == null ) {
+				_headerStyle =  new GUIStyle(GUI.skin.label);
+				_headerStyle.fontSize = 12;
+				_headerStyle.fontStyle = FontStyle.Bold;
+			}
+			
 			using ( new VerticalLayout(GUILayout.MaxWidth(MaxWidth)) ) {
+				GUILayout.Space(5);
 				using ( new HorizontalLayout() ) {
-					GUILayout.Label("Rename Tool");
+					GUILayout.Label("Rename Tool", _headerStyle);
 				}
 				using ( new HorizontalLayout(GUILayout.Width(ToolsWidth)) ) {
 					GUILayout.Label("Find In:", GUILayout.Width(TextWidth));
@@ -73,23 +96,23 @@ namespace UnityRenameTool.Editor {
 				}
 				if( LocModeObserver.Value == LocationMode.Scene ) {
 					using ( new HorizontalLayout() ) {
-						GUILayout.Label("Root:", GUILayout.Width(TextWidth));
+						GUILayout.Label(_rootLabelContent, GUILayout.Width(TextWidth));
 						RootObserver.Read();
 					}
 				}
 				using ( new HorizontalLayout() ) {
-					GUILayout.Label("Find:", GUILayout.Width(TextWidth));
+					GUILayout.Label(_findLabelContent, GUILayout.Width(TextWidth));
 					FindTextObserver.Read();
 				}
 				using ( new HorizontalLayout() ) {
-					GUILayout.Label("Replace:", GUILayout.Width(TextWidth));
+					GUILayout.Label(_replaceLabelContent, GUILayout.Width(TextWidth));
 					_replaceText = GUILayout.TextField(_replaceText);
 				}
 				using ( new HorizontalLayout() ) {
-					if( GUILayout.Button("Refresh") ) {
+					if( GUILayout.Button(_refreshButtonContent) ) {
 						Refresh();
 					}
-					if( GUILayout.Button("Rename") ) {
+					if( GUILayout.Button(_renameButtonContent) ) {
 						RenameAllSelected();
 					}
 				}
@@ -101,7 +124,7 @@ namespace UnityRenameTool.Editor {
 					}
 				}
 				using ( new HorizontalLayout(GUILayout.Width(ToolsWidth)) ) {
-					GUILayout.Label("Count:", GUILayout.Width(TextWidth));
+					GUILayout.Label(_countLabelContent, GUILayout.Width(TextWidth));
 					_replaceCount = EditorGUILayout.IntField(_replaceCount);
 				}
 			}
