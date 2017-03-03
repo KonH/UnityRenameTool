@@ -6,6 +6,8 @@
 !/Assets/
 !/ProjectSettings/
 !.gitignore
+!README.md
+!LICENSE.txt
 
 # OS Stuff
 .DS_Store
