@@ -5,6 +5,7 @@
 # Inverse ignore some stuff
 !/Assets/
 !/ProjectSettings/
+!/Packages/
 !.gitignore
 !README.md
 !LICENSE.txt
