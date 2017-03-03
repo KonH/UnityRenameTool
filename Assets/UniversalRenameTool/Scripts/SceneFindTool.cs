@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace UnityRenameTool {
+namespace UniversalRenameTool {
 	public class SceneFindTool {
 
 		System.Func<string, bool> _isWantedName = null;

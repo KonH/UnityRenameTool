@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-namespace UnityRenameTool.Editor {
+namespace UniversalRenameTool.Editor {
 	public class VerticalLayout : IDisposable {
 		public VerticalLayout(params GUILayoutOption[] options) {
 			GUILayout.BeginVertical(options);

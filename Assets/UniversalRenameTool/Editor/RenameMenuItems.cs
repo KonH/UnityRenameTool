@@ -1,6 +1,6 @@
 ﻿using UnityEditor;
 
-namespace UnityRenameTool.Editor {
+namespace UniversalRenameTool.Editor {
 	public static class RenameMenuItems {
 		
 		[MenuItem("Window/Rename Tool")]

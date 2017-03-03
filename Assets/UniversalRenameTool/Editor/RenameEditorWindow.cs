@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEditor;
 
-namespace UnityRenameTool.Editor {
+namespace UniversalRenameTool.Editor {
 	public class RenameEditorWindow : EditorWindow {
 		
 		const float MaxWidth  = 300.0f;

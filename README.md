@@ -1,8 +1,8 @@
-# Unity Rename Tool 1.0.0
+# Universal Rename Tool 1.0.0
 
 ## Overview
 
-Editor tool which allow you to replace object name parts with another values and works with multiple objects simultaneously.
+Editor tool for Unity which allow you to replace object name parts with another values and works with multiple objects simultaneously.
 
 ## Example
 

@@ -1,10 +1,8 @@
-﻿using System;
-using System.Reflection;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-namespace UnityRenameTool.Editor {
+namespace UniversalRenameTool.Editor {
 	public class ProjectFindTool {
 
 		System.Func<string, bool> _isWantedName = null;

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace UnityRenameTool {
+namespace UniversalRenameTool {
 	public class SimpleNameWorker : INameWorker {
 		
 		string _condition  = null;

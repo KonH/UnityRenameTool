@@ -1,4 +1,4 @@
-﻿namespace UnityRenameTool {
+﻿namespace UniversalRenameTool {
 	public enum FindMode {
 		Simple,
 		RegExp

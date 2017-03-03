@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEditor;
 
-namespace UnityRenameTool.Editor {
+namespace UniversalRenameTool.Editor {
 	public static class SceneRenameTool {
 		
 		public static void Rename(UnityEngine.Object go, Func<string, string> converter) {

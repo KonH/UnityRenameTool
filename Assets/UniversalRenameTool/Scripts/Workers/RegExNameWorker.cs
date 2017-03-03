@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace UnityRenameTool {
+namespace UniversalRenameTool {
 	public class RegExNameWorker : INameWorker {
 		
 		Regex _regex = null;
